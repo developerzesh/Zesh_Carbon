@@ -2,8 +2,5 @@
   "version": 2,
   "name": "zesh-carbon",
   "cleanUrls": true,
-  "trailingSlash": false,
-  "render": [
-    { "src": "index.html", "dest": "index.html" }
-  ]
+  "trailingSlash": false
 }
