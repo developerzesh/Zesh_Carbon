@@ -13,6 +13,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     :root {
       --gd: #1A5801;
@@ -2792,28 +2793,28 @@
         <div class="grid-2" style="gap:5rem; align-items:start">
           <div>
             <h3 class="mb-3">Send an enquiry</h3>
-            <div class="card" style="padding:2.5rem">
+            <form id="contact-form" class="card" style="padding:2.5rem">
               <div class="grid-2 contact-name-grid" style="gap:1rem">
                 <div class="form-group">
                   <label>First Name</label>
-                  <input type="text" placeholder="First name">
+                  <input type="text" name="first_name" placeholder="First name" required>
                 </div>
                 <div class="form-group">
                   <label>Last Name</label>
-                  <input type="text" placeholder="Last name">
+                  <input type="text" name="last_name" placeholder="Last name" required>
                 </div>
               </div>
               <div class="form-group">
                 <label>Company Name</label>
-                <input type="text" placeholder="Your company">
+                <input type="text" name="company" placeholder="Your company" required>
               </div>
               <div class="form-group">
                 <label>Business Email</label>
-                <input type="email" placeholder="you@company.com">
+                <input type="email" name="email" placeholder="you@company.com" required>
               </div>
               <div class="form-group">
                 <label>Country</label>
-                <select>
+                <select name="country">
                   <option value="">Select country</option>
                   <option>Germany</option>
                   <option>Netherlands</option>
@@ -2834,7 +2835,7 @@
               </div>
               <div class="form-group">
                 <label>Application / End Use (optional)</label>
-                <select>
+                <select name="application">
                   <option value="">Select application</option>
                   <option>Tyre manufacturing / retreading</option>
                   <option>Industrial rubber (hoses, belts, seals)</option>
@@ -2849,7 +2850,7 @@
               </div>
               <div class="form-group">
                 <label>Estimated Annual Volume (MT) (optional)</label>
-                <select>
+                <select name="volume">
                   <option value="">Select volume range</option>
                   <option>Trial / sample (< 1 MT)</option>
                   <option>1 – 10 MT</option>
@@ -2861,13 +2862,13 @@
               </div>
               <div class="form-group">
                 <label>What do you need? (optional)</label>
-                <textarea
+                <textarea name="message"
                   placeholder="e.g. We are evaluating rCB as a 20% substitution for N660 in truck tyre compounds. We need COA, TDS, and a 25kg evaluation sample. Current supplier is..."></textarea>
               </div>
-              <button class="btn-primary" style="width:100%; justify-content:center">Submit Enquiry →</button>
+              <button type="submit" id="submit-btn" class="btn-primary" style="width:100%; justify-content:center">Submit Enquiry →</button>
               <p style="font-size:12px; color:var(--muted); margin-top:1rem; text-align:center">We do not share your
                 information with third parties. Response within 1 business day.</p>
-            </div>
+            </form>
           </div>
 
           <div>
@@ -3019,6 +3020,53 @@
       document.querySelectorAll('.mobile-nav-link').forEach(l => { l.classList.remove('active'); if (l.textContent.trim() === mmap[id]) l.classList.add('active'); });
       closeMenu();
     }
+    // --- EMAILJS INTEGRATION ---
+    console.log("Script loaded and running...");
+
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("DOM fully loaded.");
+
+      // 1. Initialize EmailJS
+      if (typeof emailjs !== 'undefined') {
+        emailjs.init({ publicKey: "pPuENuc1hR1ae8MK-" });
+        console.log("EmailJS initialized.");
+      } else {
+        console.error("EmailJS SDK not found! Check your internet connection or script tag.");
+        return;
+      }
+
+      // 2. Attach Listener
+      const form = document.getElementById('contact-form');
+      const btn = document.getElementById('submit-btn');
+
+      if (form && btn) {
+        console.log("Form and Button found. Attaching listener...");
+        
+        form.addEventListener('submit', function(event) {
+          event.preventDefault();
+          console.log("Form submit triggered.");
+          
+          btn.innerHTML = 'Sending...';
+          btn.disabled = true;
+
+          emailjs.sendForm('service_l7uoegr', 'template_qu4vl4d', this)
+            .then(() => {
+              console.log('SUCCESS!');
+              btn.innerHTML = 'Submit Enquiry →';
+              btn.disabled = false;
+              alert('Enquiry sent successfully!');
+              form.reset();
+            }, (error) => {
+              console.log('FAILED...', error);
+              btn.innerHTML = 'Submit Enquiry →';
+              btn.disabled = false;
+              alert('Failed to send enquiry. Error: ' + JSON.stringify(error));
+            });
+        });
+      } else {
+        console.error("Could not find form (id='contact-form') or button (id='submit-btn') in the DOM.");
+      }
+    });
   </script>
 </body>
 
